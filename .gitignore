@@ -1,0 +1,9 @@
+token.txt
+CMakeFiles/
+build/
+.vscode/
+*.cmake
+CMakeCache.txt
+*.bak
+*.sh
+/Makefile
