@@ -31,6 +31,10 @@ slashCommandFunction createvc() {
             if (parent_id != NULL) {
                 vc.set_parent_id(parent_id);
             }
+            int maxCount = std::get<int64_t>(event.get_parameter("maxperson"));
+            if (1 <= maxCount && maxCount <= 99) {
+                vc.set_user_limit(maxCount);
+            }
 
             bot.channel_create(vc);
 
@@ -54,6 +58,14 @@ commandObject rgCreatevc() {
                     dpp::co_string,
                     "name",
                     "Name to create",
+                    true
+                )
+            )
+            .add_option(
+                dpp::command_option(
+                    dpp::co_integer,
+                    "maxperson",
+                    "maximum numbers to join the VC. set 0 or above 99 to make infinite.",
                     true
                 )
             )
