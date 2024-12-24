@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <dpp/dpp.h>
+#include <sqlite3.h>
 #include "../def.h"
 
 slashCommandFunction createvc() {
@@ -8,12 +9,29 @@ slashCommandFunction createvc() {
             dpp::snowflake parent_id = NULL;
             try {
                 // try to get category id from guild id
+                sqlite3 *db = NULL;
+                int ret = sqlite3_open("./data.db", &db);
+                if (ret == SQLITE_OK) {
+                    std::string sql = "SELECT * FROM vccategory WHERE guild == " + std::to_string(event.command.guild_id);
+                    sqlite3_stmt *stmt;
+                    ret = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, NULL);
+                    if (ret == SQLITE_OK) {
+                        if (sqlite3_step(stmt) == SQLITE_ROW) {
+                            parent_id = dpp::snowflake(std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1))));
+                        }
+                        sqlite3_finalize(stmt);
+                    }
+                    sqlite3_close(db);
+                }
             } catch(std::exception e){}
             dpp::channel vc;
             vc.set_name(std::get<std::string>(event.get_parameter("name")));
             vc.set_guild_id(event.command.guild_id);
             vc.set_type(dpp::channel_type::CHANNEL_VOICE);
-            vc.set_parent_id(dpp::snowflake(std::get<std::string>(event.get_parameter("id"))));
+            if (parent_id != NULL) {
+                vc.set_parent_id(parent_id);
+            }
+
             bot.channel_create(vc);
 
             // report that succeed
@@ -36,14 +54,6 @@ commandObject rgCreatevc() {
                     dpp::co_string,
                     "name",
                     "Name to create",
-                    true
-                )
-            )
-            .add_option(
-                dpp::command_option(
-                    dpp::co_string,
-                    "id",
-                    "id of category",
                     true
                 )
             )

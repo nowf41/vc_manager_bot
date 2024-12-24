@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include <dpp/dpp.h>
 #include "../def.h"
+#include <sqlite3.h>
 
 slashCommandFunction registercategory() {
     return [](dpp::cluster& bot, const dpp::slashcommand_t& event) {
@@ -16,7 +17,22 @@ slashCommandFunction registercategory() {
             event.reply("You don't have enough permissions.");
         } else {
             try {
-                
+                sqlite3 *db = NULL;
+                int ret = sqlite3_open("./data.db", &db);
+                if (ret == SQLITE_OK) {
+                    std::string guild = std::to_string(event.command.guild_id);
+                    std::string id = "NULL";
+                    try {
+                        id = std::to_string(dpp::snowflake(std::get<std::string>(event.get_parameter("id"))));
+                    } catch(std::exception e) {}
+                    std::string del = "DELETE FROM vccategory WHERE guild == " + guild + ";";
+                    sqlite3_exec(db, del.c_str(), NULL, NULL, NULL);
+                    if (id != "NULL") {
+                        std::string ins = "INSERT INTO vccategory VALUES ("+guild+","+id+");";
+                        sqlite3_exec(db, ins.c_str(), NULL, NULL, NULL);
+                    }
+                    sqlite3_close(db);
+                }
             } catch(std::exception e) {
                 event.reply("Failed to change target category.");
                 return;
@@ -37,7 +53,7 @@ commandObject rgRegistercategory() {
                     dpp::co_string,
                     "id",
                     "id of category",
-                    true
+                    false
                 )
             )
             ;

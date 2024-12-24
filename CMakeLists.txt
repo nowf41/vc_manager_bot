@@ -15,7 +15,7 @@ file(GLOB SOURCES
 
 add_executable(main.out ${SOURCES})
 
-target_link_libraries(main.out PRIVATE dpp)
+target_link_libraries(main.out PRIVATE dpp sqlite3)
 
 set_target_properties(main.out PROPERTIES
     CXX_STANDARD 20
