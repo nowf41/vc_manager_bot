@@ -1,5 +1,5 @@
 # vc_manager_bot
-## what is this rep?
+## what is this repo?
 this is a bot to manage voice channels made with [D++](https://dpp.dev/), an Discord API wrapper.
 
 ## how to use?
